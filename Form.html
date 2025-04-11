@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In Form</title>
+</head>
+<body>
+    <H1> Sign In. </H1>
+
+    <form id="feedbackForm" action="/" method="get">
+        <label for="username"> Name. </label>
+        <input type="text" minlength="1" maxlength="5" id="username" name="username" placeholder="Write your name" required>
+
+        <label for="email"> Email. </label>
+        <input type="email" id="email" name="email" placeholder="Write your email" required>
+
+        <label for="password"> Password (4-8 charecters).</label>
+        <input type="password" minlength="4" maxlength="8" id="password" name="password" placeholder="Write your password" required>
+
+        <label for="date">Date.</label>
+        <input type="date" name="begin" placeholder="dd-mm-yyyy" value="" min="2025-04-11" max="2025-04-13">
+
+        <label for="color"> Color. </label>
+        <input type="color" id="color" name="color" placeholder="Pick color" required>
+        
+        <button type="submit"> Submit </button>
+    
+    </form>
+</body>
+</html>
