@@ -11,13 +11,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up Page</title>
-    <link rel="stylesheet" type="text/css" href="./style1.css">
 </head>
 <body>
+    <style>
+    .background{
+    width:300px;
+    height:440px;
+    border: 10px;
+    border-radius: 40px;
+    display: flex;
+    justify-content: center;
+    object-position: center;
+    align-items: center;
+    object-position: center;        
+    margin-left: 350px;
+    margin-top: 0;
+    text-align:40px; 
+    background-color:#c29aff;
+    }
+
+    .position11 {
+        border-radius: 40px;
+        border-color: aqua;
+        display: flex;
+    justify-content: center;
+    object-position: center;
+    align-items: center;
+    object-position: center;   
+        margin-top: 10px;
+    margin-left: 30px;
+    }
+    .position2 {
+        border-radius: 40px;
+        border-color: aqua;
+        display: flex;
+    justify-content: center;
+    object-position: center;
+    align-items: center;
+    object-position: center;   
+        margin-top: 20px;
+        margin-left: 30px;
+    }
+    .position3 {
+        border-radius: 40px;
+        border-color: aqua;
+        display: flex;
+    justify-content: center;
+    object-position: center;
+    align-items: center;
+    object-position: center;   
+        margin-top: -18px;
+        margin-left: 30px;
+    }
+    .position4 {
+        border-radius: 40px;
+        border-color: aqua;
+        display: flex;
+    justify-content: center;
+    object-position: center;
+    align-items: center;
+    object-position: center;   
+        margin-top: 20px;
+        margin-left: 30px;
+    }
+    .position-of-button {
+        border-radius: 40px;
+        border-color: pink;
+        margin-left: 100px;
+    }   
+    .textstyle{
+        margin-top: 20px; 
+        color: rgb(52, 101, 101);
+    }
+    .position-of-reset{
+        border-radius: 40px;
+        border-color: rgb(41, 81, 106);
+        margin-left: 10px; 
+    }    
+    </style>
     <h1 class="background">
     <form method="get" action="https://www.google.com/">
         <h1 class="textstyle">Sign Up!</h1>
-        <br><input class="position1" type="text" minlength="1" maxlength="22" id="username" name="username" placeholder="Full Name:" required>
+        <br><input class="position11" type="text" minlength="1" maxlength="22" id="username" name="username" placeholder="Full Name:" required>
         <input class="position2" runat="server" onkeypress="return blockSpecialChar(event)" type="text" id="username" name="username" placeholder="Username:" required>
         <br><input class="position3" type="email" id="email" name="email" placeholder="Email:" required>
         <input class="position4" type="password" minlength="4" maxlength="8" id="password" name="password" placeholder="Password (4-8 characters):" required>
