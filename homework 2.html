@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Email Form</title>
+</head>
+<body>
+  <form id="contactForm">
+    <label for="name">Name</label><br>
+    <input type="text" id="name" name="name" required><br><br>
+
+    <label for="email">Gmail</label><br>
+    <input type="email" id="email" name="email" required><br><br>
+
+    <label for="message">Message</label><br>
+    <textarea id="message" name="message" required></textarea><br><br>
+
+    <br><input type="reset">
+
+    <button type="submit">Send Message</button>
+  </form>
+
+  <script>
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+
+      const mailtoLink = `mailto:${email}?subject=Message from ${name}&body=${encodeURIComponent(message)}`;
+      window.location.href = mailtoLink;
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
