@@ -6,49 +6,24 @@
             var k;
             document.all ? k = e.keyCode : k = e.which;
             return ((k > 64 && k < 91) || (k > 96 && k < 123) || k == 8 || k == 32 || (k >= 48 && k <= 57));
-            }
+        }
         </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up Page</title>
+    <link rel="stylesheet" type="text/css" href="./style1.css">
 </head>
 <body>
-    <style>
-     .background{
-    width:550px;
-    height:50px;
-    border: 10px;
-    border-radius: 40px;
-    display: flex;
-    justify-content: center;
-    object-position: center;
-    align-items: center;
-    object-position: center;        
-    margin-left: 50px;
-    margin-top: 0;
-    text-align:40px; 
-    background-color:rgb(69, 197, 252);
-    }
-
-    .position {
-        margin: 10px;
-        margin-left: 100px;
-    }
-    .position-of-pass{
-        margin-left: 1px;    
-    }
-    .position-of-button {
-        margin-left: 220px;
-    }   
-    </style>
-    <h1 class="background">Create Account</h1>
+    <h1 class="background">
     <form method="get" action="https://www.google.com/">
-        <br><input class="position" type="text" minlength="1" maxlength="22" id="username" name="username" placeholder="Full Name:" required>
-        <input runat="server" onkeypress="return blockSpecialChar(event)" class="style" type="text" id="username" name="username" placeholder="Username:" required>
-        <br><input class="position" type="email" id="email" name="email" placeholder="Email:" required>
-        <input class="position-of-pass" type="password" minlength="4" maxlength="8" id="password" name="password" placeholder="Password (4-8 characters):" required>
-        <br><input class="position" type="reset">
+        <h1 class="textstyle">Sign Up!</h1>
+        <br><input class="position1" type="text" minlength="1" maxlength="22" id="username" name="username" placeholder="Full Name:" required>
+        <input class="position2" runat="server" onkeypress="return blockSpecialChar(event)" type="text" id="username" name="username" placeholder="Username:" required>
+        <br><input class="position3" type="email" id="email" name="email" placeholder="Email:" required>
+        <input class="position4" type="password" minlength="4" maxlength="8" id="password" name="password" placeholder="Password (4-8 characters):" required>
+        <br><input class="position-of-reset" type="reset">
         <button class="position-of-button" type="submit">Sign Up</button>
     </form>
+    </h1>
 </body>
 </html>
