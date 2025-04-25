@@ -65,6 +65,7 @@
     }   
     .textstyle{
         margin-top: 20px; 
+        color: rgb(52, 101, 101);
     }
     .position-of-reset{
         border-radius: 40px;
