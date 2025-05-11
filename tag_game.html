@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2D Tag Game with Maze (2 Players)</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #333;
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 4px solid white;
+      background-color: #000;
+      display: block;
+    }
+    #scoreBar {
+      position: absolute;
+      top: 10px;
+      width: 600px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #f1c40f; /* Gold */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+    #timer {
+      position: absolute;
+      top: 40px;
+      width: 600px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1abc9c; /* Turquoise */
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+  </style>
+</head>
+<body>
+  <div id="scoreBar">Player 1 Wins: 0 | Player 2 Wins: 0</div>
+  <div id="timer">Time Remaining: 200s</div>
+  <canvas id="gameCanvas" width="600" height="600"></canvas>
+  <script>
+    // Game Initialization
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const scoreBar = document.getElementById('scoreBar');
+    const timerDisplay = document.getElementById('timer');
+    const tileSize = 40;
+
+    // Maze Layout (0 = Path, 1 = Wall)
+    const maze = [
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+      [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
+      [1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1],
+      [1, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+      [1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+      [1, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1],
+      [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+      [1, 1, 0, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+      [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+      [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ];
+
+    // Player Positions and Attributes
+    const player1 = { x: 1, y: 1, color: 'blue', wins: 0 };
+    const player2 = { x: 13, y: 11, color: 'red', wins: 0 };
+
+    // "IT" Tracking
+    let itPlayer = Math.random() < 0.5 ? 1 : 2; // Randomly choose "IT" at the start (1 = Player 1, 2 = Player 2)
+
+    // Timer
+    let timeRemaining = 200; // 200 seconds
+
+    // Draw Maze with Colors
+    function drawMaze() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let row = 0; row < maze.length; row++) {
+        for (let col = 0; col < maze[row].length; col++) {
+          if (maze[row][col] === 1) {
+            ctx.fillStyle = '#2c3e50'; // Dark gray for walls
+            ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+          } else {
+            // Checkerboard pattern for paths
+            if ((row + col) % 2 === 0) {
+              ctx.fillStyle = '#ecf0f1'; // Light gray
+            } else {
+              ctx.fillStyle = '#bdc3c7'; // Slightly darker gray
+            }
+            ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+          }
+        }
+      }
+    }
+
+    // Draw Players with Glow Effect
+    function drawPlayer(player) {
+      // Glowing effect
+      const gradient = ctx.createRadialGradient(
+        player.x * tileSize + tileSize / 2,
+        player.y * tileSize + tileSize / 2,
+        5,
+        player.x * tileSize + tileSize / 2,
+        player.y * tileSize + tileSize / 2,
+        20
+      );
+      gradient.addColorStop(0, player.color);
+      gradient.addColorStop(1, 'white');
+      ctx.fillStyle = gradient;
+
+      ctx.beginPath();
+      ctx.arc(
+        player.x * tileSize + tileSize / 2,
+        player.y * tileSize + tileSize / 2,
+        tileSize / 3,
+        0,
+        Math.PI * 2
+      );
+      ctx.fill();
+
+      // Draw "IT" indicator above the player
+      if ((itPlayer === 1 && player === player1) || (itPlayer === 2 && player === player2)) {
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(
+          player.x * tileSize + tileSize / 2 - tileSize / 6,
+          player.y * tileSize - tileSize / 4,
+          tileSize / 3,
+          tileSize / 6
+        );
+      }
+    }
+
+    // Check for Wall Collision
+    function canMove(x, y) {
+      return maze[y] && maze[y][x] === 0; // Ensure the position is within bounds and not a wall
+    }
+
+    // Handle Player Movement
+    document.addEventListener('keydown', (e) => {
+      let newX1 = player1.x;
+      let newY1 = player1.y;
+      let newX2 = player2.x;
+      let newY2 = player2.y;
+
+      // Player 1 (WASD)
+      if (e.key === 'w') newY1--;
+      if (e.key === 's') newY1++;
+      if (e.key === 'a') newX1--;
+      if (e.key === 'd') newX1++;
+
+      if (canMove(newX1, newY1)) {
+        player1.x = newX1;
+        player1.y = newY1;
+      }
+
+      // Player 2 (Arrow Keys)
+      if (e.key === 'ArrowUp') newY2--;
+      if (e.key === 'ArrowDown') newY2++;
+      if (e.key === 'ArrowLeft') newX2--;
+      if (e.key === 'ArrowRight') newX2++;
+
+      if (canMove(newX2, newY2)) {
+        player2.x = newX2;
+        player2.y = newY2;
+      }
+    });
+
+    // Check for Tag and Swap Roles
+    function checkTag() {
+      if (player1.x === player2.x && player1.y === player2.y) {
+        if (itPlayer === 1) {
+          itPlayer = 2; // Player 2 becomes "IT"
+        } else {
+          itPlayer = 1; // Player 1 becomes "IT"
+        }
+      }
+    }
+
+    // Timer Countdown
+    function updateTimer() {
+      timeRemaining--;
+      timerDisplay.textContent = `Time Remaining: ${timeRemaining}s`;
+
+      if (timeRemaining <= 0) {
+        clearInterval(timerInterval); // Stop the timer
+
+        // Determine round winner and update score
+        if (itPlayer === 1) {
+          player2.wins++;
+        } else {
+          player1.wins++;
+        }
+
+        // Update score bar
+        scoreBar.textContent = `Player 1 Wins: ${player1.wins} | Player 2 Wins: ${player2.wins}`;
+
+        // Reset for the next round
+        resetRound();
+      }
+    }
+
+    // Reset Round
+    function resetRound() {
+      player1.x = 1;
+      player1.y = 1;
+      player2.x = 13;
+      player2.y = 11;
+      timeRemaining = 200;
+      itPlayer = Math.random() < 0.5 ? 1 : 2; // Randomly choose "IT" again
+      timerDisplay.textContent = `Time Remaining: 200s`;
+      timerInterval = setInterval(updateTimer, 1000); // Restart the timer
+    }
+
+    // Game Loop
+    function gameLoop() {
+      drawMaze();
+      drawPlayer(player1);
+      drawPlayer(player2);
+      checkTag(); // Check if players collide and swap roles if needed
+      requestAnimationFrame(gameLoop);
+    }
+
+    // Start Timer
+    let timerInterval = setInterval(updateTimer, 1000);
+
+    // Start Game Loop
+    gameLoop();
+  </script>
+</body>
+</html>

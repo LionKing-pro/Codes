@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ragdoll Archers</title>
+  <style>
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #87CEEB, #2E8B57); /* Sky to ground gradient */
+      font-family: Arial, sans-serif;
+    }
+    canvas {
+      border: 4px solid black;
+      background: transparent;
+    }
+    #scoreBoard {
+      position: absolute;
+      top: 10px;
+      width: 800px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="scoreBoard">Player 1: 0 | Health: 100% | Player 2: 0 | Health: 100%</div>
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
+    // Player settings
+    const playerWidth = 30;
+    const playerHeight = 50;
+    const groundLevel = canvasHeight - 100;
+    const gravity = 0.5;
+    const jumpPower = -10;
+
+    // Arrow settings
+    const arrowWidth = 20;
+    const arrowHeight = 5;
+    const arrowSpeed = 5;
+
+    // Game state
+    const players = [
+      {
+        x: 100,
+        y: groundLevel - playerHeight,
+        color: 'red',
+        health: 100,
+        score: 0,
+        aimingAngle: -Math.PI / 4,
+        arrows: [],
+        velocityY: 0,
+        onGround: true,
+      },
+      {
+        x: canvasWidth - 130,
+        y: groundLevel - playerHeight,
+        color: 'blue',
+        health: 100,
+        score: 0,
+        aimingAngle: -Math.PI / 4,
+        arrows: [],
+        velocityY: 0,
+        onGround: true,
+      },
+    ];
+
+    const keys = {
+      w: false,
+      s: false,
+      a: false,
+      d: false,
+      ArrowUp: false,
+      ArrowDown: false,
+      ArrowLeft: false,
+      ArrowRight: false,
+    };
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key in keys) keys[e.key] = true;
+    });
+
+    document.addEventListener('keyup', (e) => {
+      if (e.key in keys) keys[e.key] = false;
+    });
+
+    function drawGround() {
+      ctx.fillStyle = 'green';
+      ctx.fillRect(0, groundLevel, canvasWidth, canvasHeight - groundLevel);
+    }
+
+    function drawPlayer(player) {
+      // Draw player body
+      ctx.fillStyle = player.color;
+      ctx.fillRect(player.x, player.y, playerWidth, playerHeight);
+
+      // Draw health bar
+      ctx.fillStyle = 'red';
+      ctx.fillRect(player.x, player.y - 10, playerWidth * (player.health / 100), 5);
+
+      // Draw aiming line
+      const aimX = player.x + playerWidth / 2 + Math.cos(player.aimingAngle) * 50;
+      const aimY = player.y + playerHeight / 2 + Math.sin(player.aimingAngle) * 50;
+      ctx.strokeStyle = 'black';
+      ctx.beginPath();
+      ctx.moveTo(player.x + playerWidth / 2, player.y + playerHeight / 2);
+      ctx.lineTo(aimX, aimY);
+      ctx.stroke();
+    }
+
+    function drawArrow(arrow) {
+      ctx.fillStyle = 'black';
+      ctx.fillRect(arrow.x, arrow.y, arrowWidth, arrowHeight);
+    }
+
+    function updatePlayer(player, controls) {
+      // Jumping
+      if (controls.jump && player.onGround) {
+        player.velocityY = jumpPower;
+        player.onGround = false;
+      }
+
+      // Gravity
+      player.velocityY += gravity;
+      player.y += player.velocityY;
+
+      // Keep player on the ground
+      if (player.y + playerHeight >= groundLevel) {
+        player.y = groundLevel - playerHeight;
+        player.velocityY = 0;
+        player.onGround = true;
+      }
+
+      // Aiming
+      if (controls.aimUp) {
+        player.aimingAngle -= 0.05;
+      }
+      if (controls.aimDown) {
+        player.aimingAngle += 0.05;
+      }
+
+      // Shooting
+      if (controls.shoot) {
+        player.arrows.push({
+          x: player.x + playerWidth / 2,
+          y: player.y + playerHeight / 2,
+          angle: player.aimingAngle,
+          speed: arrowSpeed,
+        });
+      }
+    }
+
+    function updateArrow(arrow) {
+      arrow.x += Math.cos(arrow.angle) * arrow.speed;
+      arrow.y += Math.sin(arrow.angle) * arrow.speed;
+    }
+
+    function checkArrowCollision(arrow, target) {
+      if (
+        arrow.x < target.x + playerWidth &&
+        arrow.x + arrowWidth > target.x &&
+        arrow.y < target.y + playerHeight &&
+        arrow.y + arrowHeight > target.y
+      ) {
+        return true;
+      }
+      return false;
+    }
+
+    function updateGame() {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      drawGround();
+
+      players.forEach((player, playerIndex) => {
+        const controls = playerIndex === 0
+          ? { aimUp: keys.w, aimDown: keys.s, shoot: keys.d, jump: keys.a }
+          : { aimUp: keys.ArrowUp, aimDown: keys.ArrowDown, shoot: keys.ArrowLeft, jump: keys.ArrowRight };
+
+        updatePlayer(player, controls);
+        drawPlayer(player);
+
+        player.arrows.forEach((arrow, arrowIndex) => {
+          updateArrow(arrow);
+          drawArrow(arrow);
+
+          // Check collision with the other player
+          const target = players[1 - playerIndex];
+          if (checkArrowCollision(arrow, target)) {
+            target.health -= 5;
+            player.arrows.splice(arrowIndex, 1);
+
+            // Check if the target is out of health
+            if (target.health <= 0) {
+              player.score++;
+              target.health = 100;
+              target.y = groundLevel - playerHeight; // Reset position
+              target.arrows = [];
+            }
+          }
+
+          // Remove the arrow if it goes off the canvas
+          if (arrow.x < 0 || arrow.x > canvasWidth || arrow.y < 0 || arrow.y > canvasHeight) {
+            player.arrows.splice(arrowIndex, 1);
+          }
+        });
+      });
+
+      // Update scoreboard
+      const scoreBoard = document.getElementById('scoreBoard');
+      scoreBoard.textContent = `Player 1: ${players[0].score} | Health: ${players[0].health}% | Player 2: ${players[1].score} | Health: ${players[1].health}%`;
+
+      requestAnimationFrame(updateGame);
+    }
+
+    updateGame();
+  </script>
+</body>
+</html>

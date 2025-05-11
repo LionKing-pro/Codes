@@ -1,0 +1,63 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #333;
+    color: white;
+}
+
+#game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background-color: #444;
+    overflow: hidden;
+}
+
+.player {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+}
+
+#player1 {
+    top: 100px;
+    left: 100px;
+}
+
+#player2 {
+    top: 100px;
+    right: 100px;
+    background-color: red;
+}
+
+.gun {
+    position: absolute;
+    width: 30px;
+    height: 10px;
+    background-color: black;
+    top: 20px; /* Center the gun vertically on the player */
+}
+
+/* Gun orientations */
+#gun1 {
+    left: 50px; /* Default pointing right for Player 1 */
+}
+
+#gun2 {
+    right: 50px; /* Default pointing left for Player 2 */
+}
+
+.health-bar {
+    position: absolute;
+    top: 10px;
+    font-size: 20px;
+}
+
+#health1 {
+    left: 10px;
+}
+
+#health2 {
+    right: 10px;
+}
